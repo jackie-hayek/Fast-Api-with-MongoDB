@@ -1,5 +1,3 @@
-from fastapi import HTTPException
-
 import logging
 
 from BLL.abstract_student_service import AbstractStudentService
@@ -18,30 +16,44 @@ class StudentService(AbstractStudentService):
         return new_student
 
     def get_students(self):
-        students = self.student_repository.get_students()
-        logging.info('Students list returned')
-        return students
+        try:
+            return self.student_repository.get_students()
+            logging.info('Students list returned')
+
+        except Exception as e:
+            logging.info('No Students List available')
+            raise e
 
     def get_student_by_id(self, student_id: str):
-        student = self.student_repository.get_student_by_id(student_id)
-        if not student:
+        try:
+            return self.student_repository.get_student_by_id(student_id)
+            logging.info('Student with the specified id is returned')
+        except Exception as e:
             logging.error('Student with the specified id is not found')
-            raise HTTPException(status_code=404, detail="Student not found")
-        logging.info('Student with the specified id is returned')
-        return student
+            raise e
 
     def delete_student_by_id(self, id: str):
-        deleted_student = self.student_repository.delete_student_by_id(id)
-        if not deleted_student:
+        try:
+            deleted_student = self.student_repository.delete_student_by_id(id)
+            return deleted_student
+            logging.info('Student deleted')
+
+        except Exceptions as e:
             logging.error('Student not found')
-            raise HTTPException(status_code=404, detail="Student not found")
-        logging.info('Student deleted')
-        return deleted_student
+            raise e
+
+        except Exception as e:
+            raise e
 
     def update_student(self, id: str, student: StudentsModel):
-        updated_student = self.student_repository.update_student_data(id, student)
-        if not updated_student:
+        try:
+            updated_student = self.student_repository.update_student_data(id, student)
+            logging.info('Student data updated')
+            return updated_student
+
+        except ValueError as e:
+            raise e
+
+        except Exception as e:
             logging.error('Student not found')
-            raise HTTPException(status_code=404, detail="Student not found")
-        logging.info('Student data updated')
-        return updated_student
+            raise e

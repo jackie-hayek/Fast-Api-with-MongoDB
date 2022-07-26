@@ -48,7 +48,6 @@ class UpdateStudentModel(BaseModel):
     major: Optional[str]
     enrollment_year: Optional[int]
 
-
     @validator('enrollment_year')
     def check_enrollment_year(cls, v):
         today_date = date.today()
@@ -57,6 +56,7 @@ class UpdateStudentModel(BaseModel):
             raise HTTPException(status_code=400, detail="Invalid Enrollment Year")
         else:
             return v
+
     class Settings:
         name = "student"
 

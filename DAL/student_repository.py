@@ -1,6 +1,7 @@
 from abc import ABC
-from fastapi import HTTPException, status
+
 from DAL.abstract_student_repository import AbstractStudentRepository
+from exceptions.exceptions import Exceptions
 from models.student_model import Student as StudentsModel, Student
 from typing import List, Union
 
@@ -25,7 +26,7 @@ class StudentRepository(AbstractStudentRepository, ABC):
         student_to_delete = await student_collection.find_one(Student.student_id == student_id)
 
         if student_to_delete is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource Not Found")
+            raise Exceptions(message='Student Not Found')
         else:
             await student_to_delete.delete()
             return True
@@ -36,7 +37,8 @@ class StudentRepository(AbstractStudentRepository, ABC):
             field: value for field, value in des_body.items()
         }}
         student_to_update = await student_collection.find_one(Student.student_id == student_id)
-        if student_to_update:
+        if not student_to_update:
+            raise Exceptions(message='Student Not Found')
+        else:
             await student_to_update.update(update_query)
             return student_to_update
-        return False
